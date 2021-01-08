@@ -21,12 +21,6 @@ pygame.display.set_caption("Flappy Bird")
 
 clock = pygame.time.Clock()
 
-BACKGROUND = pygame.transform.scale(
-    pygame.image.load("Assets/Background.png"), (600, 1000)
-)
-
-GRAVITY = 1.9
-
 
 class Bird:
     def __init__(self, WIDTH, HEIGHT, x=50, y=450, radius=20):
@@ -41,6 +35,8 @@ class Bird:
         )
         self.right_facing = True
         self.score = 0
+        self.alive = True
+        self.gravity = 1.9
 
     def moveUp(self, draw):
         if self.y >= 0:
@@ -68,13 +64,14 @@ class Bird:
         if self.y - 5 >= 0:
             self.y -= 5
             draw()
+        self.gravity = 1.9
 
     def hitGround(self):
         return self.y >= 830
 
-    def fall(self, GRAVITY):
+    def fall(self):
         if self.y + 170 <= self.height:
-            self.y += GRAVITY
+            self.y += self.gravity
 
     def display(self, window):
         if self.right_facing:
@@ -83,6 +80,9 @@ class Bird:
             window.blit(
                 pygame.transform.flip(self.image, True, False), (self.x, self.y)
             )
+
+    def kill(self):
+        self.alive = False
 
 
 class Base:
@@ -203,9 +203,11 @@ def main(window, bird, floor, pipe):
         if navigation_key[pygame.K_SPACE]:
             bird.jump(lambda: draw(window, bird, floor, pipe))
         clock.tick(300)
-        bird.fall(GRAVITY)
+        bird.fall()
+        bird.gravity += 0.005
         if bird.hitGround() or checkCollision(bird, pipe):
             pygame.time.delay(300)
+            bird.kill()
             window.fill(RED)
             font = pygame.font.Font("freesansbold.ttf", 50)
             text = font.render(f"SCORE: {bird.score}", True, GREEN, PURPLE)
