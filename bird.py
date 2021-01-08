@@ -51,6 +51,9 @@ class Bird:
     def hitGround(self):
         return self.y >= 830
 
+    def hitTop(self):
+        return self.y <= 3
+
     def fall(self):
         if self.y + 170 <= self.height:
             self.y += self.gravity
