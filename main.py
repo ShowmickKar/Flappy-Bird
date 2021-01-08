@@ -71,7 +71,7 @@ def main(window, bird, floor, pipe):
         clock.tick(300)
         bird.fall()
         bird.gravity += 0.005
-        if bird.hitGround() or checkCollision(bird, pipe):
+        if bird.hitGround() or bird.hitTop() or checkCollision(bird, pipe):
             pygame.time.delay(300)
             bird.kill()
             window.fill(RED)
