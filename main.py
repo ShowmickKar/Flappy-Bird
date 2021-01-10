@@ -2,10 +2,13 @@ import pygame, random
 from pipe import Pipe
 from bird import Bird
 from base import Base
+from pygame import mixer
 
 pygame.init()
 pygame.font.init()
-myfont = pygame.font.SysFont("Comic Sans MS", 60)
+
+myfont = pygame.font.SysFont("Comic Sans MS", 35)
+myfont2 = pygame.font.SysFont("Comic Sans MS", 60)
 
 BLACK = (0, 0, 0)
 WHITE = (250, 250, 250)
@@ -23,17 +26,20 @@ pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 
 
-def draw(window, bird, floor, pipe):
+def draw(window, bird, floor, pipe, HIGHEST_SCORE):
     window.fill(ORANGE)
     pipe.display(window)
     floor.display(window)
     bird.display(window)
     window.blit(myfont.render(f"SCORE: {bird.score}", False, (0, 0, 0)), (0, 0))
+    window.blit(
+        myfont.render(f"HIGHEST SCORE: {HIGHEST_SCORE}", False, (0, 0, 0)), (350, 0)
+    )
     pygame.display.update()
 
 
-def reset(window):
-    game(window)
+def reset(window, HIGHEST_SCORE):
+    game(window, HIGHEST_SCORE)
 
 
 def checkCollision(bird, pipe):
@@ -42,36 +48,35 @@ def checkCollision(bird, pipe):
             return True
 
 
-def updateHighestScore(HIGHEST_SCORE, score):
-    HIGHEST_SCORE -= HIGHEST_SCORE
-    max(HIGHEST_SCORE, score)
+HIGHEST_SCORE = 0
 
 
-def main(window, bird, floor, pipe):
+def main(window, bird, floor, pipe, HIGHEST_SCORE):
     run = True
     start = False
     object_frame = 2.5
     while run:
-        draw(window, bird, floor, pipe)
+        draw(window, bird, floor, pipe, HIGHEST_SCORE)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
         navigation_key = pygame.key.get_pressed()
         if navigation_key[pygame.K_UP]:
-            bird.moveUp(lambda: draw(window, bird, floor, pipe))
+            bird.moveUp(lambda: draw(window, bird, floor, pipe, HIGHEST_SCORE))
         if navigation_key[pygame.K_DOWN]:
-            bird.moveDown(lambda: draw(window, bird, floor, pipe))
+            bird.moveDown(lambda: draw(window, bird, floor, pipe, HIGHEST_SCORE))
         if navigation_key[pygame.K_RIGHT]:
-            bird.moveRight(lambda: draw(window, bird, floor, pipe))
+            bird.moveRight(lambda: draw(window, bird, floor, pipe, HIGHEST_SCORE))
         if navigation_key[pygame.K_LEFT]:
-            bird.moveLeft(lambda: draw(window, bird, floor, pipe))
+            bird.moveLeft(lambda: draw(window, bird, floor, pipe, HIGHEST_SCORE))
         if navigation_key[pygame.K_SPACE]:
-            bird.jump(lambda: draw(window, bird, floor, pipe))
+            bird.jump(lambda: draw(window, bird, floor, pipe, HIGHEST_SCORE))
         clock.tick(300)
         bird.fall()
         bird.gravity += 0.005
         if bird.hitGround() or bird.hitTop() or checkCollision(bird, pipe):
+            HIGHEST_SCORE = max((HIGHEST_SCORE, bird.score))
             pygame.time.delay(300)
             bird.kill()
             window.fill(RED)
@@ -80,9 +85,13 @@ def main(window, bird, floor, pipe):
             textRect = text.get_rect()
             textRect.center = (WIDTH // 2, HEIGHT // 2)
             window.blit(text, textRect)
+            window.blit(
+                myfont2.render(f"HIGHEST SCORE: {HIGHEST_SCORE}", False, (0, 0, 0)),
+                (130, 550),
+            )
             pygame.display.update()
             pygame.time.delay(2000)
-            reset(window)
+            reset(window, HIGHEST_SCORE)
         floor.move(object_frame)
         pipe.move(object_frame)
         if bird.x == pipe.x + pipe.width:
@@ -91,12 +100,12 @@ def main(window, bird, floor, pipe):
     pygame.quit()
 
 
-def game(window):
+def game(window, HIGHEST_SCORE):
     bird = Bird(WIDTH, HEIGHT)
     floor = Base(WIDTH, HEIGHT)
     pipe = Pipe(WIDTH, HEIGHT)
-    draw(window, bird, floor, pipe)
-    window.blit(myfont.render("PRESS SPACE TO START", False, RED), (0, 200))
+    draw(window, bird, floor, pipe, HIGHEST_SCORE)
+    window.blit(myfont2.render("PRESS SPACE TO START", False, RED), (0, 200))
     pygame.display.update()
     run = True
     while run:
@@ -105,8 +114,8 @@ def game(window):
                 run = False
         navigation_key = pygame.key.get_pressed()
         if navigation_key[pygame.K_SPACE]:
-            main(window, bird, floor, pipe)
+            main(window, bird, floor, pipe, HIGHEST_SCORE)
     pygame.quit()
 
 
-game(window)
+game(window, HIGHEST_SCORE)
