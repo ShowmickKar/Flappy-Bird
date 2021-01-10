@@ -10,6 +10,7 @@ pygame.font.init()
 myfont = pygame.font.SysFont("Comic Sans MS", 35)
 myfont2 = pygame.font.SysFont("Comic Sans MS", 60)
 
+
 BLACK = (0, 0, 0)
 WHITE = (250, 250, 250)
 RED = (255, 0, 0)
@@ -76,6 +77,8 @@ def main(window, bird, floor, pipe, HIGHEST_SCORE):
         bird.fall()
         bird.gravity += 0.005
         if bird.hitGround() or bird.hitTop() or checkCollision(bird, pipe):
+            mixer.music.load("Sounds/Dying-Sound.wav")
+            pygame.mixer.music.play()
             HIGHEST_SCORE = max((HIGHEST_SCORE, bird.score))
             pygame.time.delay(300)
             bird.kill()
@@ -95,6 +98,8 @@ def main(window, bird, floor, pipe, HIGHEST_SCORE):
         floor.move(object_frame)
         pipe.move(object_frame)
         if bird.x == pipe.x + pipe.width:
+            mixer.music.load("Sounds/Coin-Bonus.wav")
+            pygame.mixer.music.play()
             bird.score += 1
 
     pygame.quit()
