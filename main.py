@@ -89,7 +89,7 @@ def main(window, bird, floor, pipe, HIGHEST_SCORE):
             textRect.center = (WIDTH // 2, HEIGHT // 2)
             window.blit(text, textRect)
             window.blit(
-                myfont2.render(f"HIGHEST SCORE: {HIGHEST_SCORE}", False, (0, 0, 0)),
+                myfont2.render(f"HIGHEST SCORE: {HIGHEST_SCORE}", False, GREEN),
                 (130, 550),
             )
             pygame.display.update()
